@@ -5,7 +5,7 @@ from pdb import set_trace as stop
 import time as tm
 
 import apy_utils as uts
-import mirror_lib_v03 as mrr
+import pymirrors as mrr
 
 #TO BE MOVED WHEN SATISFACTORY RESULTS ARE OBTAINED
 from os.path import exists
@@ -14,9 +14,9 @@ import matplotlib.pyplot as pl
 from matplotlib import ticker 
 pl.ioff()
 
-pl.rcParams.update({'font.size':15})  
-pl.rcParams.update({'xtick.labelsize':14})
-pl.rcParams.update({'ytick.labelsize':14})
+pl.rcParams.update({'font.size':15/2})  
+pl.rcParams.update({'xtick.labelsize':14/2})
+pl.rcParams.update({'ytick.labelsize':14/2})
 pl.rcParams.update({'text.usetex':True}) 
 pl.rcParams['xtick.minor.visible'] = True 
 pl.rcParams['ytick.minor.visible'] = True
@@ -78,9 +78,9 @@ formatter = ticker.FuncFormatter(lambda x, p: scientificNotation(x))
 
 # Main
 
-opath = 'figures_202110_v03'
+opath = 'figures_2022_v05'
+odirseed='results_2022_v05/'
 oname = 'figure_8.pdf'
-odirseed='results_202110_v03/'
 
 
 dd='neelt'
@@ -153,7 +153,7 @@ x = np.arange(tlong//tstep) * tstep
 
 for itt, telescope in enumerate(telescopes):
   pl.close(20+itt)
-  fig, ax = pl.subplots(num=20+itt,nrows=4,ncols=4,figsize=(12,8),sharex=True)
+  fig, ax = pl.subplots(num=20+itt,nrows=4,ncols=4,figsize=(12/2,8/2),sharex=True)
   pl.subplots_adjust(left=0.07,bottom=0.07,right=0.99 \
       ,top=0.91,wspace=0.44,hspace=0.25)
   
@@ -177,7 +177,12 @@ for itt, telescope in enumerate(telescopes):
         for it_xxx in range(nx):
           for it_yyy in range(ny):
             if (relative==False):
-              ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy], linewidth=1. \
+              if ((it_xxx==0)&(it_yyy==0)):
+                ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy], linewidth=1. \
+                    , label=omethod[itm])
+              else:
+                ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy] \
+                  / int_mat[:, 0, 0], linewidth=1. \
                   , label=omethod[itm])
             else:
               ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy]\
@@ -206,14 +211,18 @@ for itt, telescope in enumerate(telescopes):
    #     auto_label_subplots(ax[it_xxx,it_yyy] \
    #         , r'M$_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
    #         , px=0.85, py=0.85)
+      if ((it_xxx == it_yyy)&(it_xxx==0)):
+        elseed = r'\mathfrak{m}'
+      else:
+        elseed = r'\tilde{\mathfrak{m}}'
       auto_label_subplots(ax[it_xxx,it_yyy] \
-          , r'$\mathfrak{m}_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
+          , r'$%s_{\rm %i,%i}$' % (elseed, it_xxx+1,it_yyy+1) \
           , px=0.85, py=0.85)
 
       if (it_xxx == 3):
         ax[it_xxx,it_yyy].set_xlabel(r't [days]')
 
-      if (it_xxx == it_yyy):
+      if ((it_xxx == it_yyy)&(it_xxx==0)):
         ax[it_xxx, it_yyy].set_ylim(0.765, 0.825)
 
   ax[0,3].legend(loc='lower center',bbox_to_anchor=(0.5,0.92) \

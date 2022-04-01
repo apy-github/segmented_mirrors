@@ -18,15 +18,23 @@ def get_labs(it, ia, ib, ic, ee):
 
   return ea, eb, ec
 #
-def plot_eaxes(ax, x, y, kws1, kws2, kws3, pkwe):
+def plot_eaxes(ax, x, y, kws1, kws2, kws3, pkwe, arrowhead=0.2):
 
-  plot_arrow(ax, x, y, arrowhead=0.2 \
+  print('\tplot_eaxes: %.4f' % (arrowhead,))
+  if ( not ('arrowhead' in kws1)):
+    kws1['arrowhead'] = arrowhead
+  if ( not ('arrowhead' in kws2)):
+    kws2['arrowhead'] = arrowhead
+  if ( not ('arrowhead' in kws3)):
+    kws3['arrowhead'] = arrowhead
+
+  plot_arrow(ax, x, y \
       , plotkwargs=pkwe, **kws1)
 
-  plot_arrow(ax, x, y, arrowhead=0.2 \
+  plot_arrow(ax, x, y \
       , plotkwargs=pkwe, **kws2)
 
-  plot_arrow(ax, x, y, arrowhead=0.2 \
+  plot_arrow(ax, x, y \
       , plotkwargs=pkwe, **kws3)
 
   return
@@ -175,12 +183,14 @@ def plot_arrow(ax, x0, y0 \
     , arrowhead=0.02, label='', labelposition='tr'\
     , plotkwargs={}, textkwargs={}):
 
+  print('\tplot_arrow: %.4f' % (arrowhead,))
+
   if (dz==dz):
-    adz = np.abs(dz)
+    adz = np.abs(dz/1.5)
     xcirc, ycirc = get_circle(x0, y0, adz)
     ax.plot(xcirc+x0, ycirc+y0, **plotkwargs)
     if (dz<0):
-      dd = adz * np.sin(45./180.*np.pi)
+      dd = adz / 1.2 * np.sin(45./180.*np.pi)
       ax.plot([x0-dd, x0+dd], [y0+dd, y0-dd], **plotkwargs)
       ax.plot([x0-dd, x0+dd], [y0-dd, y0+dd], **plotkwargs)
     else:
@@ -281,6 +291,8 @@ iperplab = r'$\hat{{\rm e}}_{\perp}'
 iparlab = r'$\hat{{\rm e}}_{\parallel}'
 ilonlab = r'$\hat{{\rm e}}_{k}'
 eendlab = r'$'
+textkwargs = {'bbox':{'boxstyle':'round', 'facecolor':'white', 'edgecolor':'white', 'alpha':0.8},}
+textkwargs = {}
 #
 #
 #
@@ -440,10 +452,6 @@ aaxlab = r'$\hat{\rm a}$'
 #
 # 
 # b) frame:
-plot_arrow(sax, 0., 0., dx=m1x.max()+0.1, dy=0., dh=0.3, label=aaxlab, labelposition='br' \
-    , plotkwargs=pkwaxes)
-plot_arrow(sax, 0., 0., dx=0., dy=dm+0.4, dh=0.3, label=zaxlab, labelposition='tl' \
-    , plotkwargs=pkwaxes)
 
 sax.set_xlim([px0,px1])
 sax.set_xlim([-0.5,px1])
@@ -460,10 +468,6 @@ sax.plot(m2a, m2z, color='k')
 
 
 
-
-#
-#
-# Incident ray:
 #
 #
 # From above: a
@@ -474,12 +478,56 @@ tax.set_xlim([min(0., x0)-0.7,max(x0,m1x.max())+1.5])
 tax.set_ylim([min(0., y0)-0.7,max(y0,m1y.max())+1.5])
 tax.set_aspect('equal')
 
+
+#
+#
+# From above: c
+#
+fax.set_aspect('equal')
+fax.set_xlim([-0.5,+1.5])
+fax.set_ylim([-0.95,+1.5])
+
+
+def get_max_dim(ax):
+  xlims = ax.get_xlim()
+  ylims = ax.get_ylim()
+  dd = min([xlims[1]-xlims[0], ylims[1]-ylims[0]])
+  return dd
+
+sdd = get_max_dim(sax)
+sax_ratio = 1
+tdd = get_max_dim(tax)
+tax_ratio = tdd / sdd
+fdd = get_max_dim(fax)
+fax_ratio = fdd / sdd
+
+
+earrowhead = 0.3
+
+
+
+
+
+
+
+
+#
+# Incident ray:
+#
+
+
+
+
 # Axes:
+    #, {'dx':m1r+0.2,'dy':0,'dh':0.3, 'label':xaxlab, 'labelposition':'tr'} \
+dh = earrowhead * tax_ratio
 plot_eaxes(tax, 0, 0 \
-    , {'dx':m1r+0.2,'dy':0,'dh':0.3, 'label':xaxlab, 'labelposition':'tr'} \
-    , {'dx':0.,'dy':m1r+0.2,'dh':0.3, 'label':yaxlab, 'labelposition':'tr'} \
-    , {'dz':0.3,'dh':0.3, 'label':zaxlab, 'labelposition':'bl'} \
+    , {'dx':m1r+0.2,'dy':0,'dh':dh, 'label':xaxlab, 'labelposition':'tr', 'textkwargs':textkwargs} \
+    , {'dx':0.,'dy':m1r+0.2,'dh':dh, 'label':yaxlab, 'labelposition':'tr', 'textkwargs':textkwargs} \
+    , {'dz':dh,'dh':0.3, 'label':zaxlab, 'labelposition':'bl', 'textkwargs':textkwargs} \
     , pkwaxes)
+
+
 
 #
 
@@ -487,15 +535,6 @@ plot_eaxes(tax, 0, 0 \
 d0x = 1.
 d0y = 0.
 d1x, d1y, _ = rotate(d0x, d0y, 0., np.pi/2., 2)
-#><# Perp. (0):
-#><plot_arrow(tax, x0, y0, dx=d0x, dy=d0y, arrowhead=0.2 \
-#><    , plotkwargs=pkwe0, label=eperplab)
-#><# Prop. (0):
-#><plot_arrow(tax, x0, y0, dz=-0.2, arrowhead=0.2 \
-#><    , plotkwargs=pkwe0, label=elonlab)
-#><# Par. (0):
-#><plot_arrow(tax, x0, y0, dx=d1x, dy=d1y, arrowhead=0.2 \
-#><    , plotkwargs=pkwe0, label=eparlab)
 
 ea, eb, ec = get_labs('0', iperplab, ilonlab, iparlab, eendlab)
 
@@ -509,6 +548,7 @@ plot_arrow(tax, x0, y0, a0=np.pi/2., l0=3., arrowhead=0. \
 plot_arrow(tax, x0, y0, a0=np.pi+ang, l0=3., arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'dashed'})
 
+dh = earrowhead * tax_ratio
 # Arc:
 ang0 = np.pi/2.
 ang1 = np.pi+ang
@@ -518,31 +558,30 @@ xarc = x0 + np.cos(angs) * larc
 yarc = y0 + np.sin(angs) * larc
 tax.plot(xarc, yarc, color=(0.6,0.6,0.6))
 # Text:
-frac = 1.2
+frac = 1.15
 tax.text(xarc.mean()*(1.+(1-frac)), yarc.mean()*frac, r'$\alpha_{1}$'\
         , verticalalignment='center', horizontalalignment='center'\
         , rotation=180+90.+angs.mean()*180./np.pi \
     )
 # Arrow:
 arrowhead = 0.3
-dang = np.arctan2(arrowhead/2., arrowhead)
-dx1 = arrowhead * np.cos(ang1-dang)
-dy1 = arrowhead * np.sin(ang1-dang)
+dang = np.arctan2(dh/2., dh)
+dx1 = dh * np.cos(ang1-dang)
+dy1 = dh * np.sin(ang1-dang)
 plot_arrow(tax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.+dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.+dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 plot_arrow(tax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.-dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.-dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 #
 
 #
-
 
 plot_eaxes(tax, x0, y0 \
-    , {'dx':d0x,'dy':d0y, 'label':ea, 'labelposition':'tr'} \
-    , {'dz':-0.2, 'label':eb, 'labelposition':'tr'} \
-    , {'dx':d1x, 'dy':d1y, 'label':ec, 'labelposition':'tr'} \
+    , {'dx':d0x,'dy':d0y, 'dh':dh, 'label':ea, 'labelposition':'tr', 'textkwargs':textkwargs} \
+    , {'dz':-dh*1.25, 'dh':dh, 'label':eb, 'labelposition':'tr', 'textkwargs':textkwargs} \
+    , {'dx':d1x, 'dy':d1y, 'dh':dh, 'label':ec, 'labelposition':'tr', 'textkwargs':textkwargs} \
     , pkwe0)
 
 #
@@ -561,21 +600,12 @@ ed1a, ed1b, _ = rotate(ed0a, ed0b, 0., np.pi/2., 2)
 
 ea, eb, ec = get_labs('1', iperplab, ilonlab, iparlab, eendlab)
 plot_eaxes(tax, x0, y0 \
-    , {'dx':ed0a,'dy':ed0b, 'label':ea, 'labelposition':'bl'} \
-    , {'dz':-0.25, 'label':eb, 'labelposition':'br'} \
-    , {'dx':ed1a, 'dy':ed1b, 'label':ec, 'labelposition':'br'} \
-    , pkwe1)
+    , {'dx':ed0a,'dy':ed0b, 'dh':dh, 'label':ea, 'labelposition':'bl', 'textkwargs':textkwargs} \
+    , {'dz':-dh, 'dh':dh, 'label':eb, 'labelposition':'br', 'textkwargs':textkwargs} \
+    , {'dx':ed1a, 'dy':ed1b, 'dh':dh, 'label':ec, 'labelposition':'br', 'textkwargs':textkwargs} \
+    , pkwe1, arrowhead=earrowhead * tax_ratio)
 #
-#plot_eaxes(tax, x0, y0 \
-#    , {'dx':ed0a,'dy':ed0b, 'label':eperplab, 'labelposition':'bl'} \
-#    , {'dz':-0.25, 'label':elonlab, 'labelposition':'br'} \
-#    , {'dx':ed1a, 'dy':ed1b, 'label':eparlab, 'labelposition':'br'} \
-#    , pkwe1)
-
 tax.set_axis_off()
-
-
-
 #
 
 
@@ -591,6 +621,14 @@ tax.set_axis_off()
 
 
 
+
+dh = earrowhead * sax_ratio
+
+# Axes:
+plot_arrow(sax, 0., 0., dx=m1x.max()+0.1, dy=0., dh=dh, label=aaxlab, labelposition='br' \
+    , plotkwargs=pkwaxes)
+plot_arrow(sax, 0., 0., dx=0., dy=dm+0.4, dh=dh, label=zaxlab, labelposition='tl' \
+    , plotkwargs=pkwaxes)
 
 a0 = np.sqrt(x0**2+y0**2)
 # Primary:
@@ -616,9 +654,9 @@ d1a, _, d1z = get_cosines(a1 - a0, 0., z1 - z0)
 ed1a, _, ed1z = rotate(d1a, 0., d1z, -np.pi/2., 1)
 ea, eb, ec = get_labs('1', iparlab, iperplab, ilonlab, eendlab)
 plot_eaxes(sax, e1a, e1z \
-    , {'dx':ed1a,'dy':ed1z, 'label':ea} \
-    , {'dz':0.2, 'label':eb} \
-    , {'dx':d1a, 'dy':d1z, 'label':ec} \
+    , {'dx':ed1a,'dy':ed1z, 'dh':dh, 'label':ea, 'textkwargs':textkwargs} \
+    , {'dz':-dh, 'dh':dh, 'label':eb, 'textkwargs':textkwargs} \
+    , {'dx':d1a, 'dy':d1z, 'dh':dh, 'label':ec, 'textkwargs':textkwargs} \
     , pkwe1)
 #plot_eaxes(sax, e1a, e1z \
 #    , {'dx':ed1a,'dy':ed1z, 'label':eparlab} \
@@ -652,9 +690,9 @@ ed2a, _, ed2z = rotate(d2a, 0., d2z, -np.pi/2., 1)
 
 ea, eb, ec = get_labs('2', iparlab, iperplab, ilonlab, eendlab)
 plot_eaxes(sax, e2a, e2z \
-    , {'dx':ed2a,'dy':ed2z, 'label':ea} \
-    , {'dz':-0.2, 'label':eb,'labelposition':'bl'} \
-    , {'dx':d2a, 'dy':d2z, 'label':ec} \
+    , {'dx':ed2a,'dy':ed2z, 'dh':dh, 'label':ea, 'textkwargs':textkwargs} \
+    , {'dz':-dh, 'dh':dh, 'label':eb,'labelposition':'bl', 'textkwargs':textkwargs} \
+    , {'dx':d2a, 'dy':d2z, 'dh':dh, 'label':ec, 'textkwargs':textkwargs} \
     , pkwe2)
 #
 #plot_eaxes(sax, e2a, e2z \
@@ -677,14 +715,14 @@ yarc = eaz + np.sin(angs) * larc
 sax.plot(xarc, yarc, color=(0.6,0.6,0.6))
 # Arrow:
 arrowhead = 0.3
-dang = np.arctan2(arrowhead/2., arrowhead)
-dx1 = arrowhead * np.cos(ang1-dang)
-dy1 = arrowhead * np.sin(ang1-dang)
+dang = np.arctan2(dh/2., dh)
+dx1 = dh * np.cos(ang1-dang)
+dy1 = dh * np.sin(ang1-dang)
 plot_arrow(sax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.+dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.+dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 plot_arrow(sax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.-dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.-dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 #
 # Arc (b):
@@ -697,14 +735,14 @@ yarc = eaz + np.sin(angs) * larc
 sax.plot(xarc, yarc, color=(0.6,0.6,0.6))
 # Arrow:
 arrowhead = 0.3
-dang = np.arctan2(arrowhead/2., arrowhead)
-dx1 = arrowhead * np.cos(ang1-dang)
-dy1 = arrowhead * np.sin(ang1-dang)
+dang = np.arctan2(dh/2., dh)
+dx1 = dh * np.cos(ang1-dang)
+dy1 = dh * np.sin(ang1-dang)
 plot_arrow(sax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.+dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.+dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 plot_arrow(sax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.-dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.-dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 #
 
@@ -735,9 +773,9 @@ ed3a, _, ed3z = rotate(d2a, 0., d2z, np.pi/2., 1)
 
 ea, eb, ec = get_labs('3', iparlab, iperplab, ilonlab, eendlab)
 plot_eaxes(sax, e3a, e3z \
-    , {'dx':ed3a,'dy':ed3z, 'label':ea} \
-    , {'dz':0.2, 'label':eb} \
-    , {'dx':d2a, 'dy':d2z, 'label':ec} \
+    , {'dx':ed3a,'dy':ed3z, 'dh':dh, 'label':ea, 'textkwargs':textkwargs} \
+    , {'dz':dh, 'dh':dh, 'label':eb, 'textkwargs':textkwargs} \
+    , {'dx':d2a, 'dy':d2z, 'dh':dh, 'label':ec, 'textkwargs':textkwargs} \
     , pkwe3)
 
 
@@ -767,9 +805,9 @@ ed4a, _, ed4z = rotate(d3a, 0., d3z, np.pi/2., 1)
 
 ea, eb, ec = get_labs('4', iparlab, iperplab, ilonlab, eendlab)
 plot_eaxes(sax, e4a, e4z \
-    , {'dx':ed4a,'dy':ed4z, 'label':ea} \
-    , {'dz':0.2, 'label':eb} \
-    , {'dx':d3a, 'dy':d3z, 'label':ec} \
+    , {'dx':ed4a,'dy':ed4z, 'dh':dh, 'label':ea, 'textkwargs':textkwargs} \
+    , {'dz':dh, 'dh':dh, 'label':eb, 'textkwargs':textkwargs} \
+    , {'dx':d3a, 'dy':d3z, 'dh':dh, 'label':ec, 'textkwargs':textkwargs} \
     , pkwe4)
 
 sax.set_axis_off()
@@ -780,9 +818,9 @@ sax.set_axis_off()
 #
 #
 # From above c)
+dh = earrowhead * fax_ratio
 
 xf, yf, _ = rotate(a3, 0., 0., ang, 2)
-fax.set_aspect('equal')
 
 dfa = -1.
 df1x, df1y, _ = rotate(dfa, 0., 0., rang, 2)
@@ -790,9 +828,9 @@ df2x, df2y, _ = rotate(df1x, df1y, 0., np.pi/2., 2)
 
 ea, eb, ec = get_labs('4', iperplab, ilonlab, iparlab, eendlab)
 plot_eaxes(fax, xf, yf \
-    , {'dx':df1x,'dy':df1y, 'label':ea} \
-    , {'dz':-0.2, 'label':eb} \
-    , {'dx':df2x, 'dy':df2y, 'label':ec} \
+    , {'dh':dh, 'dx':df1x,'dy':df1y, 'label':ea, 'textkwargs':textkwargs} \
+    , {'dh':dh, 'dz':-dh*2.6, 'label':eb, 'textkwargs':textkwargs} \
+    , {'dh':dh, 'dx':df2x, 'dy':df2y, 'label':ec, 'textkwargs':textkwargs} \
     , pkwe4)
 
 
@@ -805,32 +843,32 @@ dfc1x, dfc1y, _ = rotate(df1x, df1y, 0., np.pi/2.-ang, 2)
 # Arc:
 ang0 = ang
 ang1 = np.pi / 2.
+larc = 0.7
 # Plot angle alpha2:
-plot_arrow(fax, xf, yf, a0=ang0, l0=3., arrowhead=0. \
+plot_arrow(fax, xf, yf, a0=ang0, l0=larc*1.2, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'dashed'})
-plot_arrow(fax, xf, yf, a0=ang1, l0=3., arrowhead=0. \
+plot_arrow(fax, xf, yf, a0=ang1, l0=larc*1.2, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'dashed'})
-larc = 2.7
 angs = np.linspace(ang0, ang1, 1001)
 xarc = xf + np.cos(angs) * larc
 yarc = yf + np.sin(angs) * larc
 fax.plot(xarc, yarc, color=(0.6,0.6,0.6))
 # Text:
-frac = 1.2
+frac = 1.24
 fax.text(xarc.mean()*frac, yarc.mean()*frac, r'$\alpha_{3}$'\
         , verticalalignment='top', horizontalalignment='center'\
         , rotation=180+90.+angs.mean()*180./np.pi \
     )
 # Arrow:
 arrowhead = 0.3
-dang = np.arctan2(arrowhead/2., arrowhead)
-dx1 = arrowhead * np.cos(ang1-dang)
-dy1 = arrowhead * np.sin(ang1-dang)
+dang = np.arctan2(dh/2., dh)
+dx1 = dh * np.cos(ang1-dang)
+dy1 = dh * np.sin(ang1-dang)
 plot_arrow(fax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.+dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.+dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 plot_arrow(fax, xarc[-1], yarc[-1] \
-    , a0=angs[-1]-np.pi/2.-dang, l0=arrowhead, arrowhead=0. \
+    , a0=angs[-1]-np.pi/2.-dang, l0=dh, arrowhead=0. \
     , plotkwargs={'color':(0.6,0.6,0.6),'linewidth':0.8,'linestyle':'solid'})
 #
 
@@ -839,17 +877,34 @@ dfc2x, dfc2y, _ = rotate(dfc1x, dfc1y, 0., np.pi/2., 2)
 
 ea, eb, ec = get_labs('5', iperplab, ilonlab, iparlab, eendlab)
 plot_eaxes(fax, xf, yf \
-    , {'dx':dfc1x,'dy':dfc1y, 'label':ea} \
-    , {'dz':-0.2, 'label':eb, 'labelposition':'tl'} \
-    , {'dx':dfc2x, 'dy':dfc2y, 'label':ec} \
+    , {'dh':dh, 'dx':dfc1x,'dy':dfc1y, 'label':ea, 'textkwargs':textkwargs} \
+    , {'dh':dh, 'dz':-dh*2.1, 'label':eb, 'labelposition':'tl', 'textkwargs':textkwargs} \
+    , {'dh':dh, 'dx':dfc2x, 'dy':dfc2y, 'label':ec, 'textkwargs':textkwargs} \
     , pkwe5)
 
 
 # Axes:
 plot_eaxes(fax, 0, 0 \
-    , {'dx':2.5,'dy':0,'dh':0.3, 'label':xaxlab, 'labelposition':'tr'} \
-    , {'dx':0.,'dy':2.5,'dh':0.3, 'label':yaxlab, 'labelposition':'tr'} \
-    , {'dz':0.3,'dh':0.3, 'label':zaxlab, 'labelposition':'bl'} \
+    , {'dh':dh, 'dx':1.3,'dy':0, 'label':xaxlab, 'labelposition':'tr', 'textkwargs':textkwargs} \
+    , {'dh':dh, 'dx':0.,'dy':1.3, 'label':yaxlab, 'labelposition':'tr', 'textkwargs':textkwargs} \
+    , {'dh':dh, 'dz':dh*1.7, 'label':zaxlab, 'labelposition':'bl', 'textkwargs':textkwargs} \
     , pkwaxes)
 fax.set_axis_off()
+
+#
+#
+# Labelling each subplot:
+tax.text(0.02,0.97,'a)'\
+    , verticalalignment='top', horizontalalignment='left'\
+    , transform=fg.transFigure, bbox={'boxstyle':'round', 'facecolor':'white', 'alpha':0.5})
+sax.text(0.52,0.97,'b)'\
+    , verticalalignment='top', horizontalalignment='left'\
+    , transform=fg.transFigure, bbox={'boxstyle':'round', 'facecolor':'white', 'alpha':0.5})
+fax.text(0.02,0.47,'c)'\
+    , verticalalignment='top', horizontalalignment='left'\
+    , transform=fg.transFigure, bbox={'boxstyle':'round', 'facecolor':'white', 'alpha':0.5})
+
+
+opath = 'figures_202110_v03'
+fg.savefig("%s/fig_01_draft01.pdf" % (opath,), format='pdf', dpi=200)
 

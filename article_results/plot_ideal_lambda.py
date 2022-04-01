@@ -5,7 +5,7 @@ from pdb import set_trace as stop
 import time as tm
 
 import apy_utils as uts
-import mirror_lib_v03 as mrr
+import pymirrors as mrr
 
 #TO BE MOVED WHEN SATISFACTORY RESULTS ARE OBTAINED
 from os.path import exists
@@ -76,7 +76,8 @@ formatter = ticker.FuncFormatter(lambda x, p: scientificNotation(x))
 
 # Main
 
-opath = 'figures_202110_v03'
+opath = 'figures_2022_v05'
+odirseed='results_2022_v05/'
 oname = 'figure_4.pdf'
 
 #
@@ -116,7 +117,6 @@ print('Number of rays per segment chosen!')
 
 mltch=1
 
-odirseed='results_202110_v03/'
 #odirseed='~/scratch/apy/segmented_mirrors/results/'
 
 ################################################################################
@@ -149,8 +149,13 @@ for itn, num in enumerate(nums):
   for it_xxx in range(nx):
     for it_yyy in range(ny):
   
-      ax[it_xxx, it_yyy].plot(lambs*1.e-4 \
-          , res[itn,:, it_xxx, it_yyy], linewidth=1.)
+      if ((it_xxx==0)&(it_yyy==0)):
+        ax[it_xxx, it_yyy].plot(lambs*1.e-4 \
+            , res[itn,:, it_xxx, it_yyy], linewidth=1., color='k')
+      else:
+        ax[it_xxx, it_yyy].plot(lambs*1.e-4 \
+            , res[itn,:, it_xxx, it_yyy] / res[itn,:, 0,0] \
+            , linewidth=1., color='k')
 
       ax[it_xxx,it_yyy].yaxis.set_major_formatter(formatter)
 
@@ -160,17 +165,22 @@ for itn, num in enumerate(nums):
             | ( (it_xxx==0) & (it_yyy==1) ) \
             | ( (it_xxx==0) & (it_yyy==3) ) \
             ):
-        auto_label_subplots(ax[it_xxx,it_yyy] \
-            , r'$\mathfrak{m}_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
-            , px=0.15, py=0.85)
+        ipx=0.15
+        ipy=0.85
       elif ( (it_xxx==2) & (it_yyy==3) ):
-        auto_label_subplots(ax[it_xxx,it_yyy] \
-            , r'$\mathfrak{m}_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
-            , px=0.85, py=0.75)
+        ipx=0.85
+        ipy=0.75
       else:
-        auto_label_subplots(ax[it_xxx,it_yyy] \
-            , r'$\mathfrak{m}_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
-            , px=0.85, py=0.85)
+        ipx=0.85
+        ipy=0.85
+      if ((it_xxx == it_yyy)&(it_xxx==0)):
+        elseed = r'\mathfrak{m}'
+      else:
+        elseed = r'\tilde{\mathfrak{m}}'
+      auto_label_subplots(ax[it_xxx,it_yyy] \
+          , r'$%s_{\rm %i,%i}$' % (elseed, it_xxx+1,it_yyy+1) \
+          , px=ipx, py=ipy)
+
 
       if (itl==0):
         ax[it_xxx, it_yyy].set_yscale('log')
@@ -187,8 +197,6 @@ for itn, num in enumerate(nums):
     
       if (it_xxx==3):
         ax[it_xxx, it_yyy].set_xlabel(r'$\lambda$ [$\mu$m]')
-
-pl.tight_layout()
 
 if (not exists(opath)):
   mkdir(opath)

@@ -1,11 +1,11 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3
 
 import numpy as np
 from pdb import set_trace as stop
 import time as tm
 
 import apy_utils as uts
-import mirror_lib_v03 as mrr
+import pymirrors as mrr
 
 #TO BE MOVED WHEN SATISFACTORY RESULTS ARE OBTAINED
 from os.path import exists
@@ -14,9 +14,9 @@ import matplotlib.pyplot as pl
 from matplotlib import ticker 
 pl.ioff()
 
-pl.rcParams.update({'font.size':15})  
-pl.rcParams.update({'xtick.labelsize':14})  
-pl.rcParams.update({'ytick.labelsize':14})  
+pl.rcParams.update({'font.size':15/2.})  
+pl.rcParams.update({'xtick.labelsize':14/2.})  
+pl.rcParams.update({'ytick.labelsize':14/2.})  
 pl.rcParams.update({'text.usetex':True}) 
 pl.rcParams.update({'xtick.minor.visible':True })
 pl.rcParams.update({'ytick.minor.visible':True})
@@ -75,15 +75,15 @@ formatter = ticker.FuncFormatter(lambda x, p: scientificNotation(x))
 
 ################################################################################
 
-opath = 'figures_202110_v03'
+
+opath = 'figures_2022_v05'
+odirseed='results_2022_v05/'
 oname = 'figure_'
-#odirseed = 'results/'
-odirseed='results_202110_v03/'
 
 # Main
 
 dd='neelt'
-dd='eelt'
+#dd='eelt'
 relative = False#True#False#True
 
 
@@ -95,7 +95,7 @@ if (dd=='eelt'):
   telescopes = ['seelt', 'eelt']
   telescopes = ['eelt']
   oname = "%s7.pdf" % (oname, )
-  ylims = [0.810, 0.830]
+  ylims = [0.824, 0.827]
 else:
   telescopes = ['sgtc', 'gtc']
   telescopes = ['gtc']
@@ -141,6 +141,7 @@ if (dd=='eelt'):
   else:
     cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
 
+  nums = [4096*4]
 else:
   deltat = 10. # Days between segment exchange
   tstep = 10. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
@@ -154,9 +155,9 @@ else:
   else:
     cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
 
+  nums = [4096]
 
 
-nums = [4096]
 #
 
 
@@ -170,7 +171,7 @@ x = np.arange(tlong//tstep) * tstep
 
 for itt, telescope in enumerate(telescopes):
   pl.close(20+itt)
-  fig, ax = pl.subplots(num=20+itt,nrows=4,ncols=4,figsize=(12,8),sharex=True)
+  fig, ax = pl.subplots(num=20+itt,nrows=4,ncols=4,figsize=(12/2,8/2),sharex=True)
   pl.subplots_adjust(left=0.07,bottom=0.07,right=0.99 \
       ,top=0.91,wspace=0.44,hspace=0.25)
   
@@ -194,8 +195,13 @@ for itt, telescope in enumerate(telescopes):
         for it_xxx in range(nx):
           for it_yyy in range(ny):
             if (relative==False):
-              ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy], linewidth=1. \
-                  , label=omethod[itm])
+              if ((it_xxx==0)&(it_yyy==0)):
+                ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy], linewidth=1. \
+                    , label=omethod[itm])
+              else:
+                ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy] \
+                    / int_mat[:, 0, 0] \
+                    , linewidth=1., label=omethod[itm])
             else:
               ax[it_xxx, it_yyy].plot(x,int_mat[:, it_xxx, it_yyy]\
                   / int_mat[0,0,0]*100., linewidth=1. \
@@ -223,12 +229,22 @@ for itt, telescope in enumerate(telescopes):
    #     auto_label_subplots(ax[it_xxx,it_yyy] \
    #         , r'M$_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
    #         , px=0.85, py=0.85)
+
+      if ((it_xxx == it_yyy)&(it_xxx==0)):
+        elseed = r'\mathfrak{m}'
+      else:
+        elseed = r'\tilde{\mathfrak{m}}'
       auto_label_subplots(ax[it_xxx,it_yyy] \
-          , r'$\mathfrak{m}_{\rm %i,%i}$' % (it_xxx+1,it_yyy+1) \
+          , r'$%s_{\rm %i,%i}$' % (elseed, it_xxx+1,it_yyy+1) \
           , px=0.85, py=0.85)
 
+
       if (it_xxx == it_yyy):
-        ax[it_xxx, it_yyy].set_ylim(ylims[0], ylims[1])
+        if ((it_xxx==it_yyy)&(it_xxx!=0)):
+          ax[it_xxx, it_yyy].set_ylim(ylims[0]/int_mat[:, 0, 0].max() \
+              , ylims[1]/int_mat[:, 0, 0].min())
+        else:
+          ax[it_xxx, it_yyy].set_ylim(ylims[0], ylims[1])
       if (it_xxx == 3):
         ax[it_xxx,it_yyy].set_xlabel(r't [days]')
 
