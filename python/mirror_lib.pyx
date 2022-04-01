@@ -1451,21 +1451,16 @@ def get_primary_rays(layout, telescope):
     irads = irads[1:] - drads / 2.
 
     val = 0.#0.#14.#.0
-####
-####    from pdb import set_trace as stop
-####    stop()
 
     iangs = (np.linspace(0.+val, 360.+val, np.max([(rad_to_azi_rat*telescope.num)//azi_val,1])*azi_val+1, dtype=np.float64)) / 180. * np.pi#[0:-1]
     iangs = np.linspace(0.+val, 360.+val, (telescope.num//2)*2+1, dtype=np.float64) / 180. * np.pi
     dangs = iangs[1:]-iangs[0:-1]
     iangs = iangs[1:] - dangs / 2.
 
-    print(np.min(iangs))
+    #print(np.min(iangs))
 
     # Transform to x and y coordinates:
     
-    #ixs = irads[:,None] * np.sin(iangs)[None,:]
-    #iys = irads[:,None] * np.cos(iangs)[None,:]
     ixs = irads[:,None] * np.cos(iangs)[None,:]
     iys = irads[:,None] * np.sin(iangs)[None,:]
 
@@ -1499,7 +1494,7 @@ def get_primary_rays(layout, telescope):
     angs = (2. * np.pi) / nds
 
     totn = np.int32(nds.sum())
-    print(nds.min(), telescope.num**2, totn)
+    #print(nds.min(), telescope.num**2, totn)
 
     x1d = np.zeros((totn,), dtype="f8")
     y1d = np.zeros((totn,), dtype="f8")
