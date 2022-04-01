@@ -4,7 +4,6 @@ import numpy as np
 from pdb import set_trace as stop
 import time as tm
 
-import apy_utils as uts
 import pymirrors as mrr
 
 #TO BE MOVED WHEN SATISFACTORY RESULTS ARE OBTAINED
@@ -64,14 +63,18 @@ for method in methods:
       if (not exists(outdir)):
         mkdir(outdir)
       
-      oname1 = '%s/full_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
+      oname = '%s/w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
             % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
-      oname2 = '%s/avg_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
-            % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
-      oname3 = '%s/npts_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
-            % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
+      #oname1 = '%s/full_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
+      #      % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
+      #oname2 = '%s/avg_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
+      #      % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
+      #oname3 = '%s/npts_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
+      #      % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
       
-      if ( (not ( exists(oname1) & exists(oname2) & exists(oname3) ) ) \
+      #if ( (not ( exists(oname1) & exists(oname2) & exists(oname3) ) ) \
+      #    or (overwrite==True) ):
+      if ( (not(exists(oname))) \
           or (overwrite==True) ):
       #
         print('Initialize telescope:')
@@ -108,9 +111,10 @@ for method in methods:
         print('   ---   ')
         #
         if (savedata==True):
-          uts.writefits_v3(mat, oname1, overwrite=1)
-          uts.writefits_v3(avg_mat, oname2, overwrite=1)
-          uts.writefits_v3(npts_seg, oname3, overwrite=1)
+          np.savez(oname, mat=mat, avg_mat=avg_mat, npts_seg=npts_seg)
+          #uts.writefits_v3(mat, oname1, overwrite=1)
+          #uts.writefits_v3(avg_mat, oname2, overwrite=1)
+          #uts.writefits_v3(npts_seg, oname3, overwrite=1)
 
         if (printout==True):
           print(avg_mat)
