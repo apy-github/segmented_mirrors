@@ -368,18 +368,6 @@ def primary(telescope, order, tstep, tlong, cleandust \
                   y = y[ww[0:inum_esp]]
                 else:
                   inum_esp=np.min([inum_esp, rads.size])
-       ###??:     #
-       ###??:     #LAST MIRROR
-       ###??:     #
-       ###??:       last = rads[inum_esp-1]
-       ###??:       ww = np.where(rads == last)[0]
-       ###??:       if ( np.max(ww) > inum_esp-1 ):
-       ###??:         import pdb as pdb
-       ###??:         pdb.set_trace()
-       ###??:         inum_esp = np.max(ww) + 1
-       ###??:       rads = rads[0:inum_esp]
-       ###??:       x = x[0:inum_esp]
-       ###??:       y = y[0:inum_esp]
   
 
               # 
@@ -594,15 +582,11 @@ def primary(telescope, order, tstep, tlong, cleandust \
         print('\tNumber of simulated steps in between mirror changes: %i' \
             % (self.days_for_each_timestep, ))
 
-        #self.time_map = np.zeros((self.N, self.Ntimes, 2))
 # DOES IT WORK AT ALL?
         self.time_map = np.zeros((self.N, self.SimulatedTimes, 3), dtype=np.float64)
-        #self.cleandustcadence = cleandust * 1.
         # Caution, this variable (cleandustcadence) comes in days...
         # ... and it has to be transformed to simultion steps:
         self.cleandustcadence = cleandust / self.tstep
-        #from pdb import set_trace as stop
-        #stop()
 
       #
         return
@@ -616,7 +600,6 @@ def primary(telescope, order, tstep, tlong, cleandust \
         for it_nnn in range(self.Nfamily):
           ww=np.where(np.abs(self.families-fsort[it_nnn])<1.e-3)[0]
           sort[ww] = (np.argsort(np.random.randn(6))) * self.Nfamily + it_nnn
-          #print(sort[ww])
         sort=np.argsort(sort)
         np.random.seed()
 
@@ -645,15 +628,11 @@ def primary(telescope, order, tstep, tlong, cleandust \
           it_index.remove(it_index[init_val])
           azi360.remove(azi360[init_val])
           #
-          #while (np.size(itf_sort) < np.size(ww)):
           for it_nn2 in range(np.size(ww)-1):
             it2_a = iff_azi[-1]
             dif = (azi360 - it2_a + 360) % 360
-            #print dif, it2_a
-            #print it_index
             adif = np.abs(dif - 120.)
             ww2 = np.where(adif == np.min(adif))[0][0]
-            #print ww2
             itf_sort = np.hstack([itf_sort, it_index[ww2]])
             iff_azi = np.hstack([iff_azi, azi360[ww2]])
             #
@@ -674,11 +653,9 @@ def primary(telescope, order, tstep, tlong, cleandust \
           it_y = self.ypos[ww]
           it_a = self.azimuth[ww]
           it_sort = np.argsort(it_a)
-          #stop()
           sort = np.hstack([sort, ref_pos[ww][it_sort]])
 
       elif (order.upper() == 'AZIMUTHAL'):
-        #sort = np.argsort(self.azimuth+180./np.pi)[::-1]
         sort = np.argsort(self.azimuth)[::-1]
 
         off = 0
@@ -690,11 +667,7 @@ def primary(telescope, order, tstep, tlong, cleandust \
           if (np.size(ww)>1):
             sort[ww]=sort[ww][np.argsort(rdist[ww])[::-1]]
           off = off+ww.size
-        #nazim = np.arctan2(self.xpos, self.ypos)
-        #sort = np.argsort(nazim)
-        #stop()
 
-        #sort = np.arange(self.N)
       elif (order.upper() == 'EQUAL'):
         sort = np.int32(self.azimuth * 0)
       else:
@@ -704,63 +677,31 @@ def primary(telescope, order, tstep, tlong, cleandust \
         print("\tLINEAL")
         print("\tAZIMUTHAL")
         sys.exit()
-      #.stop()
-      #.print self.families[sort]
-#!><#.      import matplotlib.pyplot as pl
-#!><#.      pl.ion()
-#!><#.      pl.clf()
-#!><#.      for i in range(self.N):
-#!><#.        pl.plot([self.xpos[sort][i]], [self.ypos[sort][i]], label='%i' % (i+1), marker='o',color=((i*1.)/(self.N-1.),1.-(i*1.)/(self.N-1.),0.5))
-#!><#.        pl.text(self.xpos[sort][i], self.ypos[sort][i], '%i' % (i+1))
-#!><#.      pl.legend()
-#!><#.      #pl.imshow(self.time_map[:,:,1].T)
-#!><#.      from pdb import set_trace as stop
-#!><#.      stop()
-#AQUI
 
     #
-      #print(order.upper(), sort)
       self.sort = sort * 1
-#>< CHECK SORTING      pl.ion()
-#>< CHECK SORTING      pl.clf()
-#>< CHECK SORTING      for it_nnn in range(self.ypos.size):
-#>< CHECK SORTING        pl.text(self.xpos[self.sort[it_nnn]], self.ypos[self.sort[it_nnn]], '%i' % (it_nnn+1))
-#>< CHECK SORTING        print('i=%i ; azi[i]=%.2f ; r[i]=%.2f ; family[i]=%i' % (it_nnn, self.azimuth[self.sort[it_nnn]], self.dist[self.sort[it_nnn]], self.families[self.sort[it_nnn]], ))
-#>< CHECK SORTING      pl.axis('equal')
-#>< CHECK SORTING      pl.xlim(-40,40)
-#>< CHECK SORTING      pl.ylim(-40,40)
-#>< CHECK SORTING      pl.draw()
-#>< CHECK SORTING      pl.show()
-#>< CHECK SORTING      stop()
     #
       return
     #
-    def get_times_new(self, ideal):
+    def get_times(self, ideal):
     #
 
       if (ideal!=True):
 
-        #to_be_rolled = np.linspace(0.,self.period, self.Ntimes)
         to_be_rolled = np.linspace(0.,self.SimulatedTime \
             , self.SimulatedTimes) % self.period
 
 # Dust:
         frac = 0.099999
-  #      frac = 0.30
 
         cnt = 0
         while (cnt<self.N):
 
           for i in range(self.mltch):
 
-            # wrong??:offset = self.days_between_change \
-            # wrong??:    * (self.deltat/self.tstep * (self.sort[cnt] // self.mltch))
             offset = ( (self.sort[cnt]//self.mltch) * self.days_between_change ) \
                 / self.tstep
-            #stop()
 
-            # wrong??:self.time_map[cnt,:,0] = (np.arange(self.Ntimes \
-            # wrong??:    , dtype=np.float64) * self.tstep + offset) % self.period
             self.time_map[cnt,:,0] = (np.arange(self.Ntimes \
                 , dtype=np.float64) * self.tstep + offset * self.tstep) % self.period
             # in days.
@@ -769,45 +710,8 @@ def primary(telescope, order, tstep, tlong, cleandust \
                 ,:,0], (np.arange(self.Ntimes,dtype=np.float64) \
                 %self.cleandustcadence)*self.tstep]),axis=0)
 
-#            self.time_map[cnt,:,2] = ((1.+frac)**np.floor( \
-#                (self.time_map[cnt,:,0] / self.tstep) \
-#                / (1.*self.cleandustcadence)) - 1.) \
-#                * (self.cleandustcadence * self.tstep)
-#                = 
-
-        #    print(i, cnt, offset, self.time_map[cnt,0,0])
             cnt = cnt+1
 
-        import apy_utils as uts
-        #stop()
-#
-# Take into account not complete cleaning after using carbon snow:
-        #
-        # First: where are the closest to the segment exchange:
-#><        mdiff = self.time_map[:,1:,0]-self.time_map[:,0:-1,0]
-#><        schanges = []
-#><        for its in range(self.N):
-#><          schanges.append(np.where(mdiff[its,:] < 0)[0] + 1)
-#><        #
-
-
-#
-#
-#        #
-#        # First: Simulation steps since last segment change:
-#        simsteplastsch = self.time_map[0,:,0]/self.tstep
-#        #
-#        # Second: Number of cleanings since last change:
-#        numclnlastsch = simsteplastsch / self.cleandustcadence
-#        #
-#        # Third: simulation steps since we last clean:
-#        dum = np.arange(self.Ntimes) % self.cleandustcadence
-#        #
-#        # Fourth: days since last cleaning:
-#        dum2 = dum * self.tstep
-#        #
-#
-#
 #
 
         initial_num_cln_since_last_sch = (self.time_map[:,0,0] \
@@ -835,11 +739,6 @@ def primary(telescope, order, tstep, tlong, cleandust \
               * self.tstep) * frac
 
           aux = aux - 1
-
-        #for itn in range(aux.size):
-        #  print(aux[itn], bu_ginit_dust_val[itn], ginit_dust_val[itn])
-
-        #stop()
 
         it_sgm = 0
         for it_sgm in range(self.N):
@@ -890,139 +789,9 @@ def primary(telescope, order, tstep, tlong, cleandust \
             if (dum!=dum):
               stop()
 
-###          uts.plot(self.time_map[it_sgm, :, 2], vmin = 0)
-###          uts.plot(self.time_map[it_sgm, :, 1], noerase=1, color='b')
-###  
-###          stop()
-
-
-
-#
-#
-#
-
-
-# PLOT:        uts.tv(self.time_map[:,0:20,0], cmap='viridis', bar=1, num=1)
-# PLOT:        uts.tv(self.time_map[:,0:20,1], cmap='viridis', bar=1, num=2)
-# PLOT:        uts.tv(self.time_map[:,0:20,2], cmap='viridis', bar=1, num=3)
-# PLOT:        stop()
-
-
-        #><  print('it=%i' % it_ttt)
-        #><  print('D(0)= %.2f' % (first_acc_amount_dust_in_sim_steps[0] * self.tstep,))
-        #><  print('D(t>t0)= %.2f' % (accum_amount_dust_in_sim_steps[0]* self.tstep,))
-        #><  stop()
-
-#        for it_ttt in range(self.Ntimes):
-#
-#          sim_steps_since_zero = self.time_map[0,it_ttt,0]/self.tstep
-#          sim_steps_since_lastcln = dum[it_ttt]
-#
-#
-#
-#
-#          print('Sim. steps since exchange: %.2f ; Idem since last cleaning: %.2f' % (sim_steps_since_zero, sim_steps_since_lastcln))
-#          print(it_ttt==schanges[0][0])
-
-
-        #
-
-#
-# End carbon snow.
-#
-
-
-
-
-        #import matplotlib.pyplot as pl
-        #pl.ion()
-        #pl.close(1)
-        #pl.figure(1)
-        #im=pl.imshow(self.time_map[:,:,1].T)
-        #cbar=pl.colorbar(im)
-        #pl.gca(). invert_yaxis()
-        #pl.close(2)
-        #pl.figure(2)
-        #im=pl.imshow(self.time_map[:,:,0].T)
-        #cbar=pl.colorbar(im)
-        #pl.gca(). invert_yaxis()
-        #from pdb import set_trace as stop
-        #stop()
-
-    #
-      #print(self.time_map[:,0,-1], self.tstep)
-      #from pdb import set_trace as stop
-      #stop()
+      #
       return
     #
-
-    def get_times(self, ideal):
-    #
-
-      if (ideal!=True):
-
-        #to_be_rolled = np.linspace(0.,self.period, self.Ntimes)
-        to_be_rolled = np.linspace(0.,self.SimulatedTime, self.SimulatedTimes) % self.period
-        for i in range(self.N):
-  
-          offset = self.days_between_change * self.sort[i]
-          #print offset, i
-          self.time_map[i,:,0] = (np.arange(self.Ntimes, dtype=np.float64)*self.tstep+offset) % self.period
-  
-          #self.time_map[i,:,1] = self.time_map[i,:,0] * 1.
-          #self.time_map[i,:,1] = self.time_map[i,:,0] % self.cleandustcadence
-          self.time_map[i,:,1] = np.min(np.vstack([self.time_map[i,:,0], (np.arange(self.Ntimes,dtype=np.float64)*self.tstep)%self.cleandustcadence]),axis=0)
-
-      #><  dum=np.min(np.vstack([self.time_map[i,:,0], np.arange(self.Ntimes,dtype=np.float64)%self.cleandustcadence]),axis=0)
-
-      #><  from pdb import set_trace as stop
-      #><  import apy_utils as uts
-      #><  uts.tv(self.time_map[:,:,0],cmap='viridis',bar=1)
-      #><  stop()
-      #><  uts.tv(self.time_map[:,:,1],cmap='viridis',bar=1)
-      #><  stop()
-
-
- #>< #ALREADY CHECKED
- #><       #DUST: CLEANED EVERY CLEANDUSTCADENCE:
- #><       to_be_rolled = np.linspace(0.,self.SimulatedTime, self.SimulatedTimes)
- #><       store = to_be_rolled % self.cleandustcadence
- #><       snow_clean = np.where(store[1:]-store[0:-1] < 0)[0] + 1
- #><       if (np.size(snow_clean) != 0):
- #><         if (snow_clean[0]!=0):
- #><           snow_clean = np.hstack([0, snow_clean])
- #><         if (snow_clean[-1]!=self.Ntimes):
- #><           snow_clean = np.hstack([snow_clean,self.SimulatedTimes])
- #><         for i in range(snow_clean.size-1):
- #><           it=snow_clean[i]*1
- #><           it1=snow_clean[i+1]*1
- #><           to_be_subtracted = self.time_map[:,it,1] * 1. - store[i]
- #><           corrected = self.time_map[:,it:it1,1] - to_be_subtracted[:,None]
- #><           self.time_map[:,it:it1,1] = corrected * 1
- #><         # UP TO HERE IT IS ALMOST RIGHT, THE ONLY THING IS THAT FOR THOSE 
- #><         # TIMES WHEN A MIRROR IS SUBSTITUTED, I GOT TIMES BELOW ZERO
- #><         # I CORRECT THEM BY LOOKING FOR THE MIRROR CHANGING TIMES:
- #><         for i in range(self.N):
- #><           ww = np.where(self.time_map[i,:,1] < 0)[0]
- #><           if (np.size(ww) == 0):
- #><             continue
- #><           self.time_map[i,ww,1] = self.time_map[i,ww,0] * 1.
-# It seems to work:        import matplotlib.pyplot as pl
-# It seems to work:        pl.ion()
-# It seems to work:        pl.close(1)
-# It seems to work:        pl.figure(1)
-# It seems to work:        im=pl.imshow(self.time_map[:,:,1].T)
-# It seems to work:        cbar=pl.colorbar(im)
-# It seems to work:        pl.gca(). invert_yaxis()
-# It seems to work:        pl.close(2)
-# It seems to work:        pl.figure(2)
-# It seems to work:        im=pl.imshow(self.time_map[:,:,0].T)
-# It seems to work:        cbar=pl.colorbar(im)
-# It seems to work:        pl.gca(). invert_yaxis()
-# It seems to work:        from pdb import set_trace as stop
-# It seems to work:        stop()
-    #
-      return
     #
   #
   if ( (deltat==0.) & (period==0.) ):
@@ -1036,8 +805,7 @@ def primary(telescope, order, tstep, tlong, cleandust \
   segments = primary_obj(telescope, tstep, tlong, cleandust \
       , period, deltat, multiplechange)
   segments.get_order(order)
-  #segments.get_times(ideal)
-  segments.get_times_new(ideal)
+  segments.get_times(ideal)
 #
   return segments
 #
@@ -1111,34 +879,16 @@ def secondary(telescope):
       vmax = telescope.sec_ext_radius * np.sqrt(telescope.sec_num_esp) * 1.1
       if (telescope.ID == 'GTC'):
         self.ID = 'GTC'
-        #self.x = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.y = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.mirror = np.zeros((telescope.sec_num, telescope.sec_num))
       if (telescope.ID == 'SGTC'):
         self.ID = 'SGTC'
-        #self.x = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.y = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.mirror = np.zeros((telescope.sec_num, telescope.sec_num))
       if (telescope.ID == 'AGTC'):
         self.ID = 'AGTC'
-        #self.x = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.y = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.mirror = np.zeros((telescope.sec_num, telescope.sec_num))
       elif (telescope.ID == 'EELT'):
         self.ID = 'EELT'
-        #self.x = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.y = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.mirror = np.zeros((telescope.sec_num, telescope.sec_num))
       elif (telescope.ID == 'SEELT'):
         self.ID = 'SEELT'
-        #self.x = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.y = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.mirror = np.zeros((telescope.sec_num, telescope.sec_num))
       elif (telescope.ID == 'AEELT'):
         self.ID = 'AEELT'
-        #self.x = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.y = np.linspace(-vmax, vmax, telescope.sec_num)
-        #self.mirror = np.zeros((telescope.sec_num, telescope.sec_num))
 
       return
 #
@@ -1517,11 +1267,7 @@ def dirt_timing(lamb, time):
   #FIRST APPROACH: ONE DUST PARTICLE THICK PER DAY
   # AlPhA
 # Dust:
-  #alpha = 0.06
-  #alpha = 0.0006
-  #alpha = 0.008
-  #alpha = 0.0006
-  alpha = 0.003#25
+  alpha = 0.003
 
   n_s = zerodux(lamb * 1.e-4)
   n_in = 1.e0
@@ -1824,135 +1570,10 @@ def get_primary_rays(layout, telescope):
 #
   return x1d, y1d, rad, area
 
-###<OBSOLETE>::def get_primary_rays(layout, telescope):
-###<OBSOLETE>::
-###<OBSOLETE>::  if ( (layout!='polar') & (layout!='cartesian') ):
-###<OBSOLETE>::     print('')
-###<OBSOLETE>::     print('\t Unknown layout: %s for ray tracing!' % (layout,))
-###<OBSOLETE>::     print('\t Allowed options are: "polar", "cartesian"')
-###<OBSOLETE>::     print('')
-###<OBSOLETE>::     sys.exit(1)
-###<OBSOLETE>::
-###<OBSOLETE>::  factor=1.1
-###<OBSOLETE>::  # Polar:
-###<OBSOLETE>::  if (layout=='polar'):
-###<OBSOLETE>::    # set rays to be considered in a polar layout:
-###<OBSOLETE>::    azi_val = 24
-###<OBSOLETE>::    rad_to_azi_rat = 24
-###<OBSOLETE>::    #azi_val = 360
-###<OBSOLETE>::    #irads = np.linspace(0., telescope.dim_x * factor, (telescope.num//2)*2)#[1:]
-###<OBSOLETE>::    #iangs = (np.linspace(0., 360., (telescope.num//azi_val)*azi_val+1)) / 180. * np.pi#[0:-1]
-###<OBSOLETE>::    #irads = np.linspace(0., telescope.dim_x * factor, telescope.num+1)#[1:]
-###<OBSOLETE>::    #iangs = np.arange(telescope.num+1) * (2. * np.pi / np.float(telescope.num))#np.linspace(0., 360., telescope.num) / 180. * np.pi#[0:-1]
-###<OBSOLETE>::    ###############irads = np.linspace(0., telescope.dim_x * factor, (telescope.num//2)*2)#[1:]
-###<OBSOLETE>::    irads = np.linspace(0., telescope.dim_x * factor, np.max([3,telescope.num//rad_to_azi_rat]), dtype=np.float64)#[1:]
-###<OBSOLETE>::    irads = np.linspace(0., telescope.dim_x * factor, (telescope.num//2)*2+1, dtype=np.float64)
-###<OBSOLETE>::    drads = irads[1:] - irads[0:-1]
-###<OBSOLETE>::    irads = irads[1:] - drads / 2.
-###<OBSOLETE>::
-###<OBSOLETE>::    val = 0.#0.#14.#.0
-###<OBSOLETE>::####    iangs = np.arctan(drads.mean()/irads)*180./np.pi
-###<OBSOLETE>::####
-###<OBSOLETE>::####    from pdb import set_trace as stop
-###<OBSOLETE>::####    stop()
-###<OBSOLETE>::
-###<OBSOLETE>::    iangs = (np.linspace(0.+val, 360.+val, np.max([(rad_to_azi_rat*telescope.num)//azi_val,1])*azi_val+1, dtype=np.float64)) / 180. * np.pi#[0:-1]
-###<OBSOLETE>::    iangs = np.linspace(0.+val, 360.+val, (telescope.num//2)*2+1, dtype=np.float64) / 180. * np.pi
-###<OBSOLETE>::    dangs = iangs[1:] - iangs[0:-1]
-###<OBSOLETE>::    iangs = iangs[1:] - dangs / 2.
-###<OBSOLETE>::
-###<OBSOLETE>::    print(np.min(iangs))
-###<OBSOLETE>::    ###########from pdb import set_trace as stop
-###<OBSOLETE>::    #iangs = iangs - np.min(iangs)
-###<OBSOLETE>::    #iangs = iangs + val
-###<OBSOLETE>::    #iangs = iangs - np.random.randn() * np.pi
-###<OBSOLETE>::    ###########stop()
-###<OBSOLETE>::######    tpi = 2. * np.pi
-###<OBSOLETE>::######    iangs = (iangs + 10 * tpi) % (tpi)
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::######    print(np.min(iangs))
-###<OBSOLETE>::
-###<OBSOLETE>::    ################ww = np.where( (irads<1.3) | (irads>4.5) )
-###<OBSOLETE>::    ################irads = irads[ww]
-###<OBSOLETE>::
-###<OBSOLETE>::    # Transform to x and y coordinates:
-###<OBSOLETE>::    
-###<OBSOLETE>::    #ixs = irads[:,None] * np.sin(iangs)[None,:]
-###<OBSOLETE>::    #iys = irads[:,None] * np.cos(iangs)[None,:]
-###<OBSOLETE>::    ixs = irads[:,None] * np.cos(iangs)[None,:]
-###<OBSOLETE>::    iys = irads[:,None] * np.sin(iangs)[None,:]
-###<OBSOLETE>::
-###<OBSOLETE>::    d1s = drads.mean()
-###<OBSOLETE>::    d2s = dangs.mean()
-###<OBSOLETE>::
-###<OBSOLETE>::  # Cartesian:
-###<OBSOLETE>::  elif (layout=='cartesian'):
-###<OBSOLETE>::    #ixs = np.linspace(-telescope.dim_x*factor, telescope.dim_x*factor, (telescope.num//2)*2)[1:]
-###<OBSOLETE>::    #iys = np.linspace(-telescope.dim_y*factor, telescope.dim_y*factor, (telescope.num//2)*2)[1:]
-###<OBSOLETE>::    ixs = np.linspace(-telescope.dim_x*factor, telescope.dim_x*factor, (telescope.num//2)*2+1, dtype=np.float64)#[1:]
-###<OBSOLETE>::    iys = np.linspace(-telescope.dim_y*factor, telescope.dim_y*factor, (telescope.num//2)*2+1, dtype=np.float64)#[1:]
-###<OBSOLETE>::    ixs = np.linspace(-telescope.dim_x*factor, telescope.dim_x*factor, telescope.num, dtype=np.float64)#[1:]
-###<OBSOLETE>::    iys = np.linspace(-telescope.dim_y*factor, telescope.dim_y*factor, telescope.num, dtype=np.float64)#[1:]
-###<OBSOLETE>::    #ixs = np.linspace(-telescope.dim_x*factor, telescope.dim_x*factor, (telescope.num//2)*2, dtype=np.float64)#[1:]
-###<OBSOLETE>::    #iys = np.linspace(-telescope.dim_y*factor, telescope.dim_y*factor, (telescope.num//2)*2, dtype=np.float64)#[1:]
-###<OBSOLETE>::    #ixs = np.linspace(-telescope.dim_x*factor, telescope.dim_x*factor, telescope.num+1, dtype=np.float64)[1:]
-###<OBSOLETE>::    #iys = np.linspace(-telescope.dim_y*factor, telescope.dim_y*factor, telescope.num+1, dtype=np.float64)[1:]
-###<OBSOLETE>::  
-###<OBSOLETE>::    d1s = np.mean(ixs[1:]-ixs[0:-1])
-###<OBSOLETE>::    d2s = np.mean(iys[1:]-iys[0:-1])
-###<OBSOLETE>::
-###<OBSOLETE>::    ix1s = ixs[1:]-d1s/2
-###<OBSOLETE>::    iy1s = iys[1:]-d2s/2
-###<OBSOLETE>::    #ixs = ixs - np.mean(ixs[1:]-ixs[0:-1])/2.
-###<OBSOLETE>::    #iys = iys - np.mean(iys[1:]-iys[0:-1])/2.
-###<OBSOLETE>::
-###<OBSOLETE>::    print(ixs.shape)
-###<OBSOLETE>::
-###<OBSOLETE>::    #ixs = ixs[:,None] * np.ones(telescope.num, dtype=np.float64)[None,:]
-###<OBSOLETE>::    #iys = iys[None,:] * np.ones(telescope.num, dtype=np.float64)[:,None]
-###<OBSOLETE>::    ixs = ix1s[:,None] * np.ones(iy1s.size, dtype=np.float64)[None,:]
-###<OBSOLETE>::    iys = iy1s[None,:] * np.ones(ix1s.size, dtype=np.float64)[:,None]
-###<OBSOLETE>::
-###<OBSOLETE>::    print(ixs.shape)
-###<OBSOLETE>::
-###<OBSOLETE>::  else:
-###<OBSOLETE>::    print('Get geometry:')
-###<OBSOLETE>::    print('\tUnknown layout.')
-###<OBSOLETE>::    print('')
-###<OBSOLETE>::    stop()
-###<OBSOLETE>::#
-###<OBSOLETE>::  x1d = ixs.flatten()
-###<OBSOLETE>::  y1d = iys.flatten()
-###<OBSOLETE>::
-###<OBSOLETE>::###  import matplotlib.pyplot as pl
-###<OBSOLETE>::###  pl.ion()
-###<OBSOLETE>::###
-###<OBSOLETE>::###  pl.scatter(ixs, iys, edgecolor='none', s=1)
-###<OBSOLETE>::###  pl.gca().set_aspect('equal')
-###<OBSOLETE>::###
-###<OBSOLETE>::###  from pdb import set_trace as stop
-###<OBSOLETE>::###  stop()
-###<OBSOLETE>::
-###<OBSOLETE>::  return x1d, y1d, d1s, d2s
-###<OBSOLETE>::
-
 def get_geometry(telescope, beam, secondary, segments \
     , nthreads=1, osecondary=False, layout='polar', check_rays=False):
 #
   from pdb import set_trace as stop
-###<OBSOLETE>::#
-###<OBSOLETE>::  x1d, y1d, d1s, d2s = get_primary_rays(layout, telescope)
-###<OBSOLETE>::#
-###<OBSOLETE>::  segments.d11d = d1s * 1.
-###<OBSOLETE>::  segments.d21d = d2s * 1.
-###<OBSOLETE>::#
   x1d, y1d, rad1d, area1d = get_primary_rays(layout, telescope)
 #
   if (osecondary==True):
@@ -1973,12 +1594,6 @@ def get_geometry(telescope, beam, secondary, segments \
 
 # First of all, we remove all the rays that come from behind the secondary:
 
-#  pl.figure(1)
-#  pl.clf()
-#  pl.plot(secondary.isx, secondary.isy, color='k')
-#  pl.plot(secondary.esx, secondary.esy, color='k')
-#  pl.plot(x1d, y1d, color='magenta', marker='s')
-########################  x1d, y1d = cinside(secondary.isx, secondary.isy, secondary.esx, secondary.esy, x1d, y1d, nthreads, complementary=1, verbose=1)
   ww = cinside(secondary.isx, secondary.isy, secondary.esx, secondary.esy, x1d, y1d, nthreads, complementary=1, verbose=1, vectors=0)
 
   if (len(ww)>0):
@@ -1987,10 +1602,6 @@ def get_geometry(telescope, beam, secondary, segments \
     rad1d = rad1d[ww] * 1.
     area1d = area1d[ww] * 1.
 
-#  pl.plot(x1d, y1d, color='cyan', marker='x')
-#  pl.draw()
-#  pl.show()
-#  stop()
 #
 
   if (check_rays):
@@ -2002,80 +1613,6 @@ def get_geometry(telescope, beam, secondary, segments \
     ax.scatter(x1d,y1d,color='k', s=0.1, edgecolor=None)
     stop()
 
-###<OBSOLETE>::#
-###<OBSOLETE>::  def check_primary_id(iteles, ixpos, iypos, igxs, igys):
-###<OBSOLETE>::#
-###<OBSOLETE>::    if (iteles.primary_shape == 'hexagonal'):
-###<OBSOLETE>::      dumgx = igxs - ixpos
-###<OBSOLETE>::      dumgy = igys - iypos
-###<OBSOLETE>::      resgx = igxs - ixpos
-###<OBSOLETE>::      resgy = igys - iypos
-###<OBSOLETE>::#
-###<OBSOLETE>::      a = 30.e0 / 1.8e2 * np.pi
-###<OBSOLETE>::      costhU = np.cos(a) * iteles.radius
-###<OBSOLETE>::# Select pixels that fulfil first criterion:
-###<OBSOLETE>::      ww = np.where(np.abs(dumgy) <= costhU)[0]
-###<OBSOLETE>::      dumgx = dumgx[ww] * 1.
-###<OBSOLETE>::      dumgy = dumgy[ww] * 1.
-###<OBSOLETE>::      resgx = resgx[ww] * 1.
-###<OBSOLETE>::      resgy = resgy[ww] * 1.
-###<OBSOLETE>::# Rotate system 60 deg:
-###<OBSOLETE>::      a2 = 60.e0 / 1.8e2 * np.pi
-###<OBSOLETE>::      ca = np.cos(a2)
-###<OBSOLETE>::      sa = np.sin(a2)
-###<OBSOLETE>::      rot = np.array([ca, -sa, sa, ca]).reshape(2,2)
-###<OBSOLETE>::#
-###<OBSOLETE>::      out = np.dot(rot, np.vstack([dumgx,dumgy]))
-###<OBSOLETE>::      dumxg = out[0,:] * 1.
-###<OBSOLETE>::      dumyg = out[1,:] * 1.
-###<OBSOLETE>::# Select pixels that fulfil second criterion:
-###<OBSOLETE>::      ww = np.where( np.abs(dumyg) <= costhU)[0]
-###<OBSOLETE>::      dumgx = dumgx[ww] * 1.
-###<OBSOLETE>::      dumgy = dumgy[ww] * 1.
-###<OBSOLETE>::      resgx = resgx[ww] * 1.
-###<OBSOLETE>::      resgy = resgy[ww] * 1.
-###<OBSOLETE>::#
-###<OBSOLETE>::      rot = np.array([ca, sa, -sa, ca]).reshape(2,2)
-###<OBSOLETE>::#
-###<OBSOLETE>::      out = np.dot(rot, np.vstack([dumgx,dumgy]))
-###<OBSOLETE>::      dumxg = out[0,:] * 1.
-###<OBSOLETE>::      dumyg = out[1,:] * 1.
-###<OBSOLETE>::#
-###<OBSOLETE>::      ww = np.where( np.abs(dumyg) <= costhU)[0]
-###<OBSOLETE>::      dumgx = dumgx[ww] * 1.
-###<OBSOLETE>::      dumgy = dumgy[ww] * 1.
-###<OBSOLETE>::      resgx = resgx[ww] * 1.
-###<OBSOLETE>::      resgy = resgy[ww] * 1.
-###<OBSOLETE>::#
-###<OBSOLETE>::# Anular:
-###<OBSOLETE>::    elif (iteles.primary_shape == 'anular'):
-###<OBSOLETE>::      dumgx = igxs - ixpos
-###<OBSOLETE>::      dumgy = igys - iypos
-###<OBSOLETE>::      resgx = igxs - ixpos
-###<OBSOLETE>::      resgy = igys - iypos
-###<OBSOLETE>::
-###<OBSOLETE>::      dumrad = np.sqrt(dumgx**2+dumgy**2)
-###<OBSOLETE>::      ww = np.where(dumrad <= iteles.rad_max)[0]
-###<OBSOLETE>::
-###<OBSOLETE>::      dumrad = dumrad[ww]
-###<OBSOLETE>::      resgx = resgx[ww]
-###<OBSOLETE>::      resgy = resgy[ww]
-###<OBSOLETE>::
-###<OBSOLETE>::      ww = np.where(dumrad >= iteles.rad_min)[0]
-###<OBSOLETE>::
-###<OBSOLETE>::      dumrad = dumrad[ww]
-###<OBSOLETE>::      resgx = resgx[ww]
-###<OBSOLETE>::      resgy = resgy[ww]
-###<OBSOLETE>::
-###<OBSOLETE>::# Otherwise:
-###<OBSOLETE>::    else:
-###<OBSOLETE>::      print('Primary shape unknown!')
-###<OBSOLETE>::      print('')
-###<OBSOLETE>::      print('')
-###<OBSOLETE>::      sys.exit()
-###<OBSOLETE>::#
-###<OBSOLETE>::    return resgx + ixpos, resgy + iypos
-###<OBSOLETE>::
 #
   def check_primary_id(iteles, ixpos, iypos, igxs, igys, igrad, igarea):
 #
@@ -2212,14 +1749,6 @@ def get_geometry(telescope, beam, secondary, segments \
   for it_sgm in range(segments.N):
 
     tm1 = tm.time()
-    ######x, y = check_primary_id(telescope\
-    ######   , segments.xpos[it_sgm], segments.ypos[it_sgm], x1d, y1d)
-#############    x, y, rad, area = check_primary_id(telescope\
-#############       , segments.xpos[it_sgm], segments.ypos[it_sgm], x1d, y1d, rad1d, area1d)
-
-
-
-
 
     wpos = check_primary(telescope, segments.xpos[it_sgm], segments.ypos[it_sgm], x1d, y1d, nthreads)
 
@@ -2315,16 +1844,6 @@ def get_geometry(telescope, beam, secondary, segments \
     segments.i2['%i' % (it_sgm,)]=i_2[ww]
     segments.th1['%i' % (it_sgm,)]=th[ww]
 
-#><::    segments.rad['%i' % (it_sgm,)] = np.sqrt(x[ww]**2+y[ww]**2)
-#><::
-#><::    if (layout=='polar'):
-#><::      segments.area['%i' % (it_sgm,)] = segments.rad['%i' % (it_sgm,)] \
-#><::          * segments.d11d * segments.d21d
-#><::    elif (layout=='cartesian'):
-#><::      segments.area['%i' % (it_sgm,)] = segments.rad['%i' % (it_sgm,)] \
-#><::          * 0. +  segments.d11d * segments.d21d
-#><::
-
     segments.rad['%i' % (it_sgm,)] = rad[ww] * 1.
     segments.area['%i' % (it_sgm,)] = area[ww] * 1.
 
@@ -2344,7 +1863,6 @@ def get_geometry(telescope, beam, secondary, segments \
   #
   if (osecondary==True):
     print(" !! PLOT !!")
-    import apy_utils as uts
     ax.set_xlim(np.min(secondary.x), np.max(secondary.x))
     ax.set_ylim(np.min(secondary.y), np.max(secondary.y))
     ax.set_aspect('equal')
@@ -2429,114 +1947,18 @@ def chex_syst(\
 # ---------------------------------------------------------------------
 #
 
-def get_mdust(n, mean_dust):
-#
-#
-  def snell(n1, n2, theta1):
-  
-    return np.arcsin(n1 * np.sin(theta1) / n2)
-#
-  def tpar(n1, n2, theta1, theta2):
-  
-    return (2. * n1 * np.cos(theta1)) / (n1 * np.cos(theta1) + n2 * np.cos(theta2))
-#
-  def tper(n1, n2, theta1, theta2):
-  
-    return (2. * n1 * np.cos(theta2)) / (n1 * np.cos(theta2) + n2 * np.cos(theta1))
-#
-  #t_par_1 = 
-  #t_par_2 = 
-  #t_per_1 = 
-  #t_per_2 = 
-#
-  calculate = 0 # This calculation has to be repeated when changing n of dust
-  if (calculate == 1):
-    ####upplim = 40.
-    rtd = 180. / np.pi
-    upplim = 90.#np.arcsin(np.sin(np.pi/2.)*n2.real/n1.real)*rtd
-#
-    n1 = 1.
-    n2 = n * 1.
-    n3 = 1.
-#
-    num = 100001
-    dtor = np.pi / 180.
-
-    thetas = np.linspace(0., upplim, num)
-    dtheta = (thetas[1] - thetas[0]) * dtor
-
-    int1 = 0.
-    int3 = 0.
-
-    for it_th1 in thetas:
-
-      theta1 = it_th1 * dtor
-      theta2 = snell(n1, n2, theta1)
-  ####    print(it_th1, theta2/dtor)
-  ####    if ( theta2/dtor > 45.):
-  ####      print(theta2/dtor)
-  ####      continue
-      theta3 = snell(n2.real, n3.real, theta2)
-
-      tpar1 = tpar(n1.real, n2.real, theta1, theta2)
-      tpar2 = tpar(n2.real, n3.real, theta2, theta3)
-      tper1 = tper(n1.real, n2.real, theta1, theta2)
-      tper2 = tper(n2.real, n3.real, theta2, theta3)
-####      theta3 = snell(n2, n3, theta2)
-####
-####      tpar1 = tpar(n1, n2, theta1, theta2)
-####      tpar2 = tpar(n2, n3, theta2, theta3)
-####      tper1 = tper(n1, n2, theta1, theta2)
-####      tper2 = tper(n2, n3, theta2, theta3)
-
-      it1 = (tpar1*tpar2)**2+(tper1*tper2)**2
-      it3 = 2. * tpar1 * tpar2 * tper1 * tper2
-
-      int1 += it1 * np.sin(theta1) * dtheta
-      int3 += it3 * np.sin(theta1) * dtheta
-
-
-    print("a = %.8f / 2. / np.pi" % (int1,))
-    print("d = %.8f / 2. / np.pi" % (int3,))
-
-###    print(int1)
-###    print(int3)
-    stop()
-
-  #a = (t_par_2 * t_par_1)**2 + (t_per_2 * t_per_1)**2
-  #d = 2. * (np.conj(t_par_2*t_par_1)*(t_per_2*t_per_1)).real
-  #a = 1. + ((4. * n**2)/((1.+n**2)**2))**2
-  #d = (8. * n**2)/((1.+n**2)**2)
-  #a = 0.42751143
-  #d = 0.42720953
-  a = 1.38942494 / 2. / np.pi
-  d = 1.35253306 / 2. / np.pi
-#
-  #a = a.real[0] / 4. * np.pi
-  #d = d.real[0] / 4. * np.pi
-  a = a / 4. * np.pi
-  d = d / 4. * np.pi
-#
-  mat = np.zeros((4,4))
-  mat[0,0] = np.exp(mean_dust.real * (2. * a - 1.)) 
-  mat[1,1] = np.exp(mean_dust.real * ((a + d) - 1.)) 
-  mat[2,2] = np.exp(mean_dust.real * ((a + d) - 1.)) 
-  mat[3,3] = np.exp(mean_dust.real * (2. * d - 1.)) 
-#
-  return mat
-
 #
 # ---------------------------------------------------------------------
 #
 
-def new_get_mdust(p0, mean_dust):
+def get_mdust(p0, mean_dust):
 #
 #
   mat = np.zeros((4,4))
-  mat[0,0] = 1. - mean_dust.real# * (1.-p0)
-  mat[1,1] = 1. - mean_dust.real# * (1.-p0)
-  mat[2,2] = 1. - mean_dust.real# * (1.-p0)
-  mat[3,3] = 1. - mean_dust.real# * (1.-p0)
+  mat[0,0] = 1. - mean_dust.real
+  mat[1,1] = 1. - mean_dust.real
+  mat[2,2] = 1. - mean_dust.real
+  mat[3,3] = 1. - mean_dust.real
 #
   return mat
 #
@@ -2546,7 +1968,6 @@ def new_get_mdust(p0, mean_dust):
 
 def get_mueller_time(segments, materials,cdust=False, thetaref=0., nthreads=1):
 
-  import apy_utils as uts
 #
   tarea = 0.
   for it in range(segments.N):
@@ -2555,9 +1976,7 @@ def get_mueller_time(segments, materials,cdust=False, thetaref=0., nthreads=1):
 #RUN TIMES:
   res = np.zeros((segments.SimulatedTimes, segments.N, 4, 4))
   avg_res = np.zeros((segments.SimulatedTimes, 4, 4))
-#  avg_res_test = np.zeros((4, 4))
   for it_tms in range(segments.SimulatedTimes):
-    #print("Timestep: %i of %i" % (it_tms, segments.SimulatedTimes))
 #RUN SEGMENTS:
     npts_seg = np.ones((segments.N,), dtype=np.float64)
     ntot2=0
@@ -2581,8 +2000,7 @@ def get_mueller_time(segments, materials,cdust=False, thetaref=0., nthreads=1):
 
       #GET Mdust
       if (cdust==True):
-        ###mmpd = get_mdust(materials.n_d, materials.d_d[it_sgm, it_tms])
-        mmpd = new_get_mdust(0.1, materials.d_d[it_sgm, it_tms])
+        mmpd = get_mdust(0.1, materials.d_d[it_sgm, it_tms])
         res_full = mmpa_full.dot(mmpd)
       else:
         res_full = mmpa_full * 1.
@@ -2593,24 +2011,16 @@ def get_mueller_time(segments, materials,cdust=False, thetaref=0., nthreads=1):
       res[it_tms,it_sgm,:,:]=np.sum(res_full[:,:,:] \
           * segments.area['%i' % (it_sgm,)][:,None,None], axis=0) / tarea
       #
-      #
-      # Area to normalize:
-      #######npts_seg[it_sgm] = np.sum(segments.area['%i' % (it_sgm,)])
 
     txt = " t=%i(/%i) ; " % (it_tms, segments.SimulatedTimes,)
     txt += " nrays=%i ; " % (ntot2, )
     txt += " area=%.8f" % (tarea, )
     print(txt, end='\r', flush=True)
-    #print("Timestep: %i of %i" % (it_tms, segments.SimulatedTimes))
-    #print('Total number of rays considered: %i' % ntot2)
-    #print('Total area considered: %.4f' % (tarea,))
     
 
     # Since we consider all the points of each segment, the average must...
     # ... be done accordingly:
-    avg_res[it_tms,:,:] = np.sum(res[it_tms,:,:,:], axis=0)#### \
-#####        / np.sum(npts_seg)
-  print("")
+    avg_res[it_tms,:,:] = np.sum(res[it_tms,:,:,:], axis=0)
 
   return avg_res, res, npts_seg
 
@@ -3409,7 +2819,6 @@ def get_mueller_time(segments, materials,cdust=False, thetaref=0., nthreads=1):
 ###><TA::
 ###><TA::
 ###><TA::def plot_mueller_elements(segments, materials,cdust=False):
-###><TA::  import apy_utils as uts
 ###><TA::#
 ###><TA::  tarea = 0.
 ###><TA::  for it in range(segments.N):
@@ -3459,7 +2868,7 @@ def get_mueller_time(segments, materials,cdust=False, thetaref=0., nthreads=1):
 ###><TA::      #GET Mdust
 ###><TA::      if (cdust==True):
 ###><TA::        ###mmpd = get_mdust(materials.n_d, materials.d_d[it_sgm, it_tms])
-###><TA::        mmpd = new_get_mdust(0.1, materials.d_d[it_sgm, it_tms])
+###><TA::        mmpd = get_mdust(0.1, materials.d_d[it_sgm, it_tms])
 ###><TA::        res_full = mmpa_full.dot(mmpd)
 ###><TA::      else:
 ###><TA::        res_full = mmpa_full * 1.
