@@ -45,9 +45,8 @@ extension_name = "pymirrors"
 
 comp_flags=['-O3','-std=c++14','-march=native','-fPIC','-fopenmp', '-I./src']
 
-#, 'test.cpp'
 extension = Extension(extension_name,
-                      sources=["mirror_lib_v04.pyx"], 
+                      sources=["mirror_lib.pyx"], 
                       include_dirs=["./",numpy.get_include(), root_dir+'/include/'],
                       language="c++",
                       extra_compile_args=comp_flags,
