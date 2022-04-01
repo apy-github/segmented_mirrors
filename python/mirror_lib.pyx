@@ -356,10 +356,10 @@ def primary(telescope, order, tstep, tlong, cleandust \
               y = y[ww]
 #
               if (inum_esp!= rads.size):
-                print("")
-                print("\t Warning!, number of segments inside maximum radius is too big")
-                print(" %i -> %i" % (inum_esp,rads.size,))
-                print("")
+                #print("")
+                #print("\t Warning!, number of segments inside maximum radius is too big")
+                #print(" %i -> %i" % (inum_esp,rads.size,))
+                #print("")
 
                 if (inum_esp<rads.size):
                   ww = np.argsort(rads)
