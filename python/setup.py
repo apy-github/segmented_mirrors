@@ -60,7 +60,6 @@ setup(
     name = extension_name,
     version = '0.0',
     author = 'apy',
-    setup_requires = ["cython", "numpy", "matplotlib", "scipy"],
     ext_modules=[extension],
     cmdclass = {'build_ext': build_ext}
 )
