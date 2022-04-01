@@ -11,7 +11,7 @@ import matplotlib.pyplot as pl
 pl.ioff()
 
 #
-nthread = 8
+nthread = 16
 
 idealc = False
 cdust = False
@@ -19,11 +19,12 @@ plotsec = False
 printout = False
 savedata = True
 overwrite = False
-
-odirseed = 'results_article/'
-
 #
-telescope = 'gtc'
+odirseed = 'results_article/'
+#
+#
+#
+telescope = 'eelt'
 #
 # Checked:
 methods = []
@@ -32,25 +33,22 @@ methods.append('lineal')
 methods.append('random')
 methods.append('symmetric')
 #
+# Orientation:
 alpha = 0.
 x_alpha = 0.
 y_alpha = 0.
 
-
-
-#
-# Number of rays to consider in the radial and proxi for the azimuth directions:
-nums=[4096]
-#
-# Wavelengths:
-lambs = np.linspace(2100.,24000.,219+1)
-deltat=10.#15
+deltat=1
 cleandust=1.
-tstep=10.#4.4
-tlong=370
+tstep=1.
+tlong=798//2+1
+lambs = [5000.]
 
-mltch=1
+mltch=2
+nums=[4096*4]
 
+
+################################################################################
 
 if (not exists(odirseed)):
   mkdir(odirseed)

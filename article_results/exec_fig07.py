@@ -11,7 +11,7 @@ import matplotlib.pyplot as pl
 pl.ioff()
 
 #
-nthread = 16
+nthread = 8
 
 idealc = False
 cdust = False
@@ -19,33 +19,64 @@ plotsec = False
 printout = False
 savedata = True
 overwrite = False
-#
+
 odirseed = 'results_article/'
+
 #
+telescope = 'gtc'
 #
-#
-telescope = 'eelt'
-#
-# Checked:
 methods = []
 methods.append('azimuthal')
 methods.append('lineal')
 methods.append('random')
 methods.append('symmetric')
+#methods = ['lineal']
 #
-# Orientation:
+print('Telescope chosen!')
 alpha = 0.
 x_alpha = 0.
 y_alpha = 0.
+print('Orientation chosen!')
+print('Number of rays per segment chosen!')
 
-deltat=1
-cleandust=1.
-tstep=1.
-tlong=798//2+1
-lambs = [5000.]
+if (telescope=='eelt'):
+  #
+  #
+  nums = [4096]
+  #
+  #
+  lambs = [5000.]
+  #
+  #
+  deltat = 1.
+  tstep = 1. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
+  tlong = 798//2+1
+  mltch = 2
 
-mltch=2
-nums=[4096*4]
+  if (cdust==True):
+    cleandust = 30.      # DUST CLEANING TIME FREQUENCY [in days?]
+  else:
+    cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
+
+elif (telescope=='gtc'):
+  #
+  #
+  nums = [4096]
+  #
+  #
+  lambs = [5000.]
+  #
+  #
+  deltat = 10. # Days between segment exchange
+  tstep = 10. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
+  tlong = 370 # Simulated days
+  mltch = 1
+
+  if (cdust==True):
+    cleandust = 30.      # DUST CLEANING TIME FREQUENCY [in days?]
+  else:
+    cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
+
 
 
 ################################################################################
@@ -67,7 +98,7 @@ for method in methods:
       oname = '%s/w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i' \
             % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
       
-      if ( (not(exists(oname))) \
+      if ( (not exists(oname)) \
           or (overwrite==True) ):
       #
         t0 = tm.time()
@@ -89,13 +120,14 @@ for method in methods:
         t4 = tm.time()
         avg_mat,mat,npts_seg = mrr.get_mueller_time(segments, materials \
             , cdust=cdust, nthreads=nthread)
-        
+
         t5 = tm.time()
         
         print('   ***   %.3f Sec. ===   ' % (t5-t0,))
         #
         if (savedata==True):
           np.savez(oname, mat=mat, avg_mat=avg_mat, npts_seg=npts_seg)
+
 
         if (printout==True):
           print(avg_mat)

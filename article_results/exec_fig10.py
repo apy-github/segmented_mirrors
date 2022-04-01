@@ -10,47 +10,61 @@ from os import mkdir
 import matplotlib.pyplot as pl
 pl.ioff()
 
-#
 nthread = 8
 
 idealc = False
-cdust = False
+cdust = True
 plotsec = False
 printout = False
 savedata = True
 overwrite = False
-
+#
 odirseed = 'results_article/'
-
+#
+#
 #
 telescope = 'gtc'
 #
-# Checked:
 methods = []
 methods.append('azimuthal')
 methods.append('lineal')
 methods.append('random')
 methods.append('symmetric')
 #
+# Orientation:
 alpha = 0.
 x_alpha = 0.
 y_alpha = 0.
 
+if (telescope=='eelt'):
+  deltat = 1.
+  lambs = [5000.]
+  nums = [720]
+  tstep = 1. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
+  tlong = 798//2+1
+  mltch = 2
 
+  if (cdust==True):
+    cleandust = 30.      # DUST CLEANING TIME FREQUENCY [in days?]
+  else:
+    cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
 
-#
-# Number of rays to consider in the radial and proxi for the azimuth directions:
-nums=[4096]
-#
-# Wavelengths:
-lambs = np.linspace(2100.,24000.,219+1)
-deltat=10.#15
-cleandust=1.
-tstep=10.#4.4
-tlong=370
+elif (telescope=='gtc'):
+  deltat = 10. # Days between segment exchange
+  tstep = 10. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
+  lambs = [5000.]
+  nums = [720]
+  tlong = 370 # Simulated days
+  mltch = 1
 
-mltch=1
+  if (cdust==True):
+    cleandust = 30.      # DUST CLEANING TIME FREQUENCY [in days?]
+  else:
+    cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
 
+nums = [4096]
+
+################################################################################
 
 if (not exists(odirseed)):
   mkdir(odirseed)
