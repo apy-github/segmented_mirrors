@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from pdb import set_trace as stop
 import time as tm
 
-import apy_utils as uts
 import pymirrors as mrr
 
-#TO BE MOVED WHEN SATISFACTORY RESULTS ARE OBTAINED
 from os.path import exists
 from os import mkdir
 import matplotlib.pyplot as pl
@@ -19,11 +16,11 @@ nthread = 8
 idealc = False
 cdust = False
 plotsec = False
-printout = True
+printout = False
 savedata = True
 overwrite = False
 
-odirseed = 'results_2022_v05/'
+odirseed = 'results_article/'
 
 #
 telescope = 'gtc'
@@ -43,10 +40,16 @@ print('Orientation chosen!')
 print('Number of rays per segment chosen!')
 
 if (telescope=='eelt'):
+  #
+  #
+  nums = [4096]
+  #
+  #
+  lambs = [5000.]
+  #
+  #
   deltat = 1.
   tstep = 1. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
-  lambs = [5000.]
-  nums = [4096]
   tlong = 798//2+1
   mltch = 2
 
@@ -56,10 +59,16 @@ if (telescope=='eelt'):
     cleandust = 1.      # DUST CLEANING TIME FREQUENCY [in days?]
 
 elif (telescope=='gtc'):
+  #
+  #
+  nums = [4096]
+  #
+  #
+  lambs = [5000.]
+  #
+  #
   deltat = 10. # Days between segment exchange
   tstep = 10. # SIMULATION TIME STEP   $NUMBER OF TIMESTEPS FOR EACH MIRROR
-  lambs = [5000.]
-  nums = [4096]
   tlong = 370 # Simulated days
   mltch = 1
 
@@ -86,22 +95,15 @@ for method in methods:
       if (not exists(outdir)):
         mkdir(outdir)
       
-      oname1 = '%s/full_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
-            % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
-      oname2 = '%s/avg_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
-            % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
-      oname3 = '%s/npts_mueller_matrix_w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.fits' \
+      oname = '%s/w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i' \
             % (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
       
-      if ( (not ( exists(oname1) & exists(oname2) & exists(oname3) ) ) \
+      if ( (not exists(oname)) \
           or (overwrite==True) ):
       #
-        print('Initialize telescope:')
         t0 = tm.time()
         teles = mrr.init_telescope(telescope, num)
-        print('Initialize secondary:')
         secondary = mrr.secondary(teles)
-        print('Initialize beam:')
         beam = mrr.init_beam(alpha, x_alpha, y_alpha,degrees=True)
         
         t1 = tm.time()
@@ -121,18 +123,12 @@ for method in methods:
 
         t5 = tm.time()
         
-        print('   ***   ')
-        print((t1-t0))
-        print((t2-t1))
-        print((t3-t2))
-        print((t4-t3))
-        print((t5-t4))
-        print('   ---   ')
+        print('   ***   %.3f Sec. ===   ' % (t5-t0,))
         #
         if (savedata==True):
-          uts.writefits_v3(mat, oname1, overwrite=1)
-          uts.writefits_v3(avg_mat, oname2, overwrite=1)
-          uts.writefits_v3(npts_seg, oname3, overwrite=1)
+          np.savez(oname, mat=mat, avg_mat=avg_mat, npts_seg=npts_seg)
+
+
         if (printout==True):
           print(avg_mat)
 
