@@ -748,7 +748,7 @@ def primary(telescope, order, tstep, tlong, cleandust \
   
             # First time:
             if (it_ttt == 0):
-              print(" Segment %i dust value: %.4f" % (it_sgm, ginit_dust_val[it_sgm]))
+              #print(" Segment %i dust value: %.4f" % (it_sgm, ginit_dust_val[it_sgm]))
               self.time_map[it_sgm, it_ttt, 2] = ginit_dust_val[it_sgm] * 1.
               continue
   
@@ -1093,7 +1093,7 @@ def dirt_timing(lamb, time):
       lam = lam[sort]
       n = n[sort]
       f = interpol(lam, n)
-      print(lam[0], lam_in, lam[-1])
+      #print(lam[0], lam_in, lam[-1])
       n_out = f(lam_in)
       k_out = 0.
       return n_out, k_out
