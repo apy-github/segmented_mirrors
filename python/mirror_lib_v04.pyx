@@ -1762,9 +1762,9 @@ def get_geometry(telescope, beam, secondary, segments \
       y = y1d[ww] * 1.
       rad = rad1d[ww] * 1.
       area = area1d[ww] * 1.
-      print("")
-      print(x1d.size, ww.size, wwn.size)
-      print("")
+    #  print("")
+    #  print(x1d.size, ww.size, wwn.size)
+    #  print("")
       x1d = x1d[wwn] * 1.
       y1d = y1d[wwn] * 1.
       rad1d = rad1d[wwn] * 1.
