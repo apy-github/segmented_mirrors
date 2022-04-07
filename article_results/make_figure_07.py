@@ -165,8 +165,8 @@ for itt, telescope in enumerate(telescopes):
         # Posibles necesidades: tstep, tlong, cleansdust, period, tlong
         oname = '%s/w%.2f_Dt%.2f_St%.2f_%08i_%010.2f_%i.npz' % \
               (outdir, lamb, deltat, tstep, tlong, cleandust, mltch, )
-        print(oname)
-        data = np.load(onyame)
+
+        data = np.load(oname)
         int_mat = data['avg_mat']
         #int_mat = uts.readfits_v3(oname2, path='./')[1]
         
