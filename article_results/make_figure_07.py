@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 import numpy as np
-from pdb import set_trace as stop
 import time as tm
 
-import pymirrors as mrr
+#import pymirrors as mrr
 
-#TO BE MOVED WHEN SATISFACTORY RESULTS ARE OBTAINED
 from os.path import exists
 from os import mkdir
 import matplotlib.pyplot as pl
@@ -16,11 +14,12 @@ pl.ioff()
 pl.rcParams.update({'font.size':15/2.})  
 pl.rcParams.update({'xtick.labelsize':14/2.})  
 pl.rcParams.update({'ytick.labelsize':14/2.})  
-pl.rcParams.update({'text.usetex':True}) 
+pl.rcParams.update({'text.usetex':False}) 
 pl.rcParams.update({'xtick.minor.visible':True })
 pl.rcParams.update({'ytick.minor.visible':True})
 
-pl.rcParams['text.latex.preamble'] = [r"\usepackage{amsfonts}",]
+if (pl.rcParams['text.usetex']):
+  pl.rcParams['text.latex.preamble'] = [r"\usepackage{amsfonts}",]
 
 #---------------------------------------------------------------------
 #
@@ -193,9 +192,16 @@ for itt, telescope in enumerate(telescopes):
       ax[it_xxx,it_yyy].yaxis.set_major_formatter(formatter)
 
       if ((it_xxx == it_yyy)&(it_xxx==0)):
-        elseed = r'\mathfrak{m}'
+        if (pl.rcParams['text.usetex']):
+          elseed = r'\mathfrak{m}'
+        else:
+          elseed = r'm'
       else:
-        elseed = r'\tilde{\mathfrak{m}}'
+        if (pl.rcParams['text.usetex']):
+          elseed = r'\tilde{\mathfrak{m}}'
+        else:
+          elseed = r'\tilde{m}'
+
       auto_label_subplots(ax[it_xxx,it_yyy] \
           , r'$%s_{\rm %i,%i}$' % (elseed, it_xxx+1,it_yyy+1) \
           , px=0.85, py=0.85)
