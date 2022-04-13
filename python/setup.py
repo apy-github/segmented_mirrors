@@ -20,10 +20,13 @@ root_dir = str(pathlib.Path(*p.parts[0:-2]))
 
 # MacOsx case
 if(plt.system() == 'Darwin'):
-    root_dir = '/opt/local/'
-    CC = 'clang'
+    #root_dir = '/usr/'
+    CC= 'clang'
     CXX= 'clang++'
-    link_opts = ["-bundle","-undefined","dynamic_lookup", "-fopenmp"]
+    #CC= 'gcc-mp-9'
+    #CXX= 'g++-mp-9'
+    link_opts = ["-bundle","-undefined","dynamic_lookup"]#, "-fopenmp"]
+    #link_opts = ["-shared", "-fopenmp"]
 
 else: # Linux
     #root_dir = '/usr/'
@@ -43,7 +46,7 @@ sysconfig.get_config_vars()['CPP'] = CXX
 
 extension_name = "pymirrors"
 
-comp_flags=['-O3','-std=c++14','-march=native','-fPIC','-fopenmp', '-I./src']
+comp_flags=['-O3','-std=c++14','-march=native','-fPIC', '-I./src']
 
 extension = Extension(extension_name,
                       sources=["mirror_lib.pyx"], 

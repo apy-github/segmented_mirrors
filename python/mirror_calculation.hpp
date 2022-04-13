@@ -8,7 +8,8 @@
 
 namespace mrr{
   //
-  constexpr double pi() {return std::atan(1)*4;}
+  //constexpr double pi() {return std::atan(1)*4;}
+  double pi() {return std::atan(1)*4;}
   //
   //
   template <typename Tdr> void get_rotation(Tdr const &ang, Tdr* mat){
